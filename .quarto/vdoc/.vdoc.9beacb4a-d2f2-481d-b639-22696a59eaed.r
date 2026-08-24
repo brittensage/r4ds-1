@@ -1,33 +1,33 @@
----
-title: "Analyzing Music Data"
-format: html
-execute:
-  echo: false
----
-author: "Britten"
-
-```{r}
+#
+#
+#
+#
+#
+#
+#
+#
+#
 #| message: false
 library(tidyverse)
-```
-
-```{r}
+#
+#
+#
 #| cache: true
 #| message: false
 music <- read_csv("data/music.csv")
-```
-
-```{r}
+#
+#
+#
 names(music)
-```
-
-```{r}
+#
+#
+#
 music |>
   select(starts_with("artist")) |>
   glimpse()
-```
-
-```{r}
+#
+#
+#
 music |>
   select(
     artist.name,
@@ -41,13 +41,13 @@ music |>
     song.year
   ) |>
   slice_head(n = 8)
-```
-
-`artist.familiarity` measures how familiar an artist is to listeners on a scale
-from 0 to 1. `artist.hotttnesss` measures the artist's popularity when the data
-was downloaded in December 2010, also on a scale from 0 to 1.
-
-```{r}
+#
+#
+#
+#
+#
+#
+#
 music |>
   summarize(
     `artist.location` = sum(artist.location == ""),
@@ -62,9 +62,9 @@ music |>
     names_to = "column",
     values_to = "placeholder_rows"
   )
-```
-
-```{r}
+#
+#
+#
 music |>
   distinct(artist.id, artist.name, artist.latitude, artist.longitude) |>
   mutate(
@@ -75,9 +75,9 @@ music |>
     )
   ) |>
   count(coordinate_status, name = "artists")
-```
-
-```{r}
+#
+#
+#
 world_map <- maps::map("world", plot = FALSE, fill = TRUE)
 world <- tibble(
   x = world_map$x,
@@ -91,16 +91,13 @@ artist_locations <- music |>
     artist.name,
     artist.latitude,
     artist.longitude,
-    artist.familiarity,
-    artist.terms,
-    song.year
+    artist.familiarity
   ) |>
   filter(
     !is.na(artist.latitude),
     !is.na(artist.longitude),
     !(artist.latitude == 0 & artist.longitude == 0),
-    artist.familiarity > 0,
-    song.year != 0
+    artist.familiarity > 0
   )
 
 ggplot() +
@@ -116,22 +113,22 @@ ggplot() +
     aes(
       x = artist.longitude,
       y = artist.latitude,
-      color = song.year
+      color = artist.familiarity
     ),
     alpha = 0.5,
     na.rm = TRUE
   ) +
   coord_quickmap() +
   labs(
-    title = "Song release years across mapped artists",
-    subtitle = "Point color shows song year; only songs with nonzero years and artists with usable coordinates are shown",
+    title = "Artist familiarity across the world",
+    subtitle = "Point color shows familiarity; coverage is limited to artists with usable coordinates and familiarity above 0",
     x = "Longitude",
     y = "Latitude",
-    color = "Song year"
+    color = "Artist familiarity"
   )
-```
-
-```{r}
+#
+#
+#
 music |>
   summarize(
     across(
@@ -150,9 +147,9 @@ music |>
     names_to = c("variable", ".value"),
     names_pattern = "^(.*)_(minimum|first_quartile|median|third_quartile|maximum)$"
   )
-```
-
-```{r}
+#
+#
+#
 music_years <- music |>
   filter(song.year != 0)
 
@@ -165,22 +162,22 @@ music_years |>
     x = "Year",
     y = "Number of songs"
   )
-```
-
-```{r}
+#
+#
+#
 billboard |>
   select(artist, track, date.entered, wk1:wk4)
-```
-
-```{r}
+#
+#
+#
 billboard |>
   summarize(
     earliest = min(date.entered),
     latest = max(date.entered)
   )
-```
-
-```{r}
+#
+#
+#
 billboard_long <- billboard |>
   pivot_longer(
     cols = starts_with("wk"),
@@ -219,9 +216,9 @@ ggplot(top10_long, aes(x = week, y = rank, group = interaction(artist, track))) 
     y = "Rank",
     color = "Notable songs"
   )
-```
-
-```{r}
+#
+#
+#
 billboard |>
   summarize(
     across(
@@ -237,9 +234,9 @@ billboard |>
     names_to = c("week", ".value"),
     names_sep = "_"
   )
-```
-
-```{r}
+#
+#
+#
 rank_comparison <- billboard |>
   mutate(
     rank_change = wk6 - wk1,
@@ -259,17 +256,17 @@ rank_comparison |>
     songs_with_both_weeks = sum(!is.na(rank_change)),
     median_rank_change = median(rank_change, na.rm = TRUE)
   )
-```
-
-```{r}
+#
+#
+#
 billboard_long |>
   group_by(artist, track) |>
   arrange(week, .by_group = TRUE) |>
   summarize(re_entered = any(diff(week) > 1), .groups = "drop") |>
   count(re_entered)
-```
-
-```{r}
+#
+#
+#
 song_summary <- billboard_long |>
   group_by(artist, track) |>
   summarize(
@@ -306,4 +303,7 @@ bind_rows(
     notable, artist, track, first_rank, best_rank,
     first_week_at_best, total_weeks
   )
-```
+#
+#
+#
+#
