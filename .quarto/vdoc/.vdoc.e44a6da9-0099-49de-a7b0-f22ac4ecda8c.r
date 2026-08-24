@@ -1,30 +1,30 @@
----
-title: "Analyzing Music Data"
-format: html
-execute:
-  echo: false
----
-author: "Britten"
-
-```{r}
+#
+#
+#
+#
+#
+#
+#
+#
+#
 #| message: false
 library(tidyverse)
-```
-
-```{r}
+#
+#
+#
 billboard |>
   select(artist, track, date.entered, wk1:wk4)
-```
-
-```{r}
+#
+#
+#
 billboard |>
   summarize(
     earliest = min(date.entered),
     latest = max(date.entered)
   )
-```
-
-```{r}
+#
+#
+#
 billboard_long <- billboard |>
   pivot_longer(
     cols = starts_with("wk"),
@@ -36,36 +36,17 @@ billboard_long <- billboard |>
   )
 
 billboard_long |>
-  group_by(artist, track) |>
-  filter(any(rank <= 10)) |>
-  ungroup() -> top10_long
-
-notable_songs <- tibble(
-  artist = c("Madonna", "Lonestar", "Creed"),
-  track = c("Music", "Amazed", "Higher")
-)
-
-highlighted_songs <- top10_long |>
-  semi_join(notable_songs, by = c("artist", "track"))
-
-ggplot(top10_long, aes(x = week, y = rank, group = interaction(artist, track))) +
-  geom_line(color = "gray70", alpha = 0.4, na.rm = TRUE) +
-  geom_line(
-    data = highlighted_songs,
-    aes(color = paste(artist, track, sep = " - ")),
-    linewidth = 0.9,
-    na.rm = TRUE
-  ) +
+  ggplot(aes(x = week, y = rank, group = track)) +
+  geom_line(alpha = 0.15, na.rm = TRUE) +
   scale_y_reverse() +
   labs(
-    title = "Top-10 song rankings over time",
+    title = "Song rankings over time",
     x = "Week",
-    y = "Rank",
-    color = "Notable songs"
+    y = "Rank"
   )
-```
-
-```{r}
+#
+#
+#
 billboard |>
   summarize(
     across(
@@ -81,9 +62,9 @@ billboard |>
     names_to = c("week", ".value"),
     names_sep = "_"
   )
-```
-
-```{r}
+#
+#
+#
 rank_comparison <- billboard |>
   mutate(
     rank_change = wk6 - wk1,
@@ -103,17 +84,17 @@ rank_comparison |>
     songs_with_both_weeks = sum(!is.na(rank_change)),
     median_rank_change = median(rank_change, na.rm = TRUE)
   )
-```
-
-```{r}
+#
+#
+#
 billboard_long |>
   group_by(artist, track) |>
   arrange(week, .by_group = TRUE) |>
   summarize(re_entered = any(diff(week) > 1), .groups = "drop") |>
   count(re_entered)
-```
-
-```{r}
+#
+#
+#
 song_summary <- billboard_long |>
   group_by(artist, track) |>
   summarize(
@@ -150,4 +131,7 @@ bind_rows(
     notable, artist, track, first_rank, best_rank,
     first_week_at_best, total_weeks
   )
-```
+#
+#
+#
+#
